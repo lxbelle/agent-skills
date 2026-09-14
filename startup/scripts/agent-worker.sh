@@ -116,23 +116,26 @@ build_command() {
     codex)
       # Sandbox is OS-enforced. --json streams events; -o writes the final message.
       if [ -n "$resume_id" ]; then set -- codex exec resume "$resume_id"; else set -- codex exec; fi
-      [ -n "${WORKER_MODEL:-}" ] && set -- "$@" -m "$WORKER_MODEL"
+      [ -z "${WORKER_MODEL:-}" ] || set -- "$@" -m "$WORKER_MODEL"
       set -- "$@" -C "$root" -s "$sandbox" --json -o "$last" -
       printf '%s\n' "$@"
       ;;
     claude)
-      # Boundary is the permission mode: plan (no edits) for read-only, auto
-      # (classifier, destructive actions denied) for workspace-write. Prompts are
-      # never shown in -p mode; denied actions come back in permission_denials.
-      if [ "$sandbox" = "read-only" ]; then mode="plan"; else mode="auto"; fi
+      # Boundary: permission mode auto (classifier; destructive actions denied,
+      # prompts never shown in -p mode, denials listed in permission_denials).
+      # read-only additionally removes the editing tools; the manager still
+      # verifies the tree, as with any client. Plan mode is deliberately not
+      # used: it writes plan files outside the repository.
+      if [ "$sandbox" = "read-only" ]; then deny="Edit,Write,NotebookEdit,WebFetch,WebSearch"; else deny="WebFetch,WebSearch"; fi
       # The prompt arrives on stdin (documented pipe usage of -p).
-      set -- claude -p --output-format json --permission-mode "$mode" --permission-prompts none \
-        --disallowedTools "WebFetch,WebSearch"
-      [ -n "${WORKER_MODEL:-}" ] && set -- "$@" --model "$WORKER_MODEL"
-      [ -n "$resume_id" ] && set -- "$@" --resume "$resume_id"
+      set -- claude -p --output-format json --permission-mode auto --permission-prompts none \
+        --disallowedTools "$deny"
+      [ -z "${WORKER_MODEL:-}" ] || set -- "$@" --model "$WORKER_MODEL"
+      [ -z "$resume_id" ] || set -- "$@" --resume "$resume_id"
       printf '%s\n' "$@"
       ;;
   esac
+  return 0
 }
 
 # Per-client identity/usage/final-message extraction from $events.
@@ -147,9 +150,10 @@ extract_identity() {
       usage_line="$(python3 -c 'import json,sys;d=json.load(open(sys.argv[1]));print(json.dumps(d.get("usage",{})))' "$events" 2>/dev/null || true)"
       python3 -c 'import json,sys;d=json.load(open(sys.argv[1]));open(sys.argv[2],"w").write(str(d.get("result","")))' "$events" "$last" 2>/dev/null || true
       denials="$(python3 -c 'import json,sys;d=json.load(open(sys.argv[1]));print(len(d.get("permission_denials",[])))' "$events" 2>/dev/null || echo "?")"
-      [ "$denials" != "0" ] && echo "Permission denials: $denials (see $events)"
+      [ "$denials" = "0" ] || echo "Permission denials: $denials (see $events)"
       ;;
   esac
+  return 0
 }
 
 if [ "$print_only" -eq 1 ]; then
@@ -171,10 +175,10 @@ set -e
 rm -f "$run_dir/.argv"
 thread=""; usage_line=""
 extract_identity
-[ -n "$thread" ] && echo "$thread" > "$run_dir/thread_id"
+[ -z "$thread" ] || echo "$thread" > "$run_dir/thread_id"
 echo "Run directory: $run_dir"
 echo "Run id: ${thread:-unknown}   Exit code: $code"
 echo "Usage: ${usage_line:-unknown}"
 echo "Final message: $last ($(wc -l < "$last" 2>/dev/null || echo 0) lines)"
-[ -s "$errlog" ] && echo "Stderr: $errlog ($(wc -l < "$errlog") lines)"
+[ ! -s "$errlog" ] || echo "Stderr: $errlog ($(wc -l < "$errlog") lines)"
 exit "$code"

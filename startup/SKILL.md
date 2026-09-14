@@ -279,7 +279,7 @@ its own location; refuses a role whose file carries `Dispatch: manual` or a
 prompt, raw output, final message and stderr under `target/agents/runs/`; and
 prints only the run directory, run id, exit code and usage. Access levels map
 to each client's own boundary (Codex sandbox; Claude permission mode `plan`
-for read-only and `auto` for workspace-write), never to a bypass flag. Record
+for both levels, with editing tools removed for read-only), never to a bypass flag. Record
 the copy in `RULES.md` as the launch command; it is a helper, not a dependency
 of the method.
 
