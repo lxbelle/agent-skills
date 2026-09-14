@@ -17,8 +17,8 @@ persist files. Verification uses available project tools; no runtime packages ar
 bundled. Delegation uses the host's native subagents, an authorized command-line
 worker that the manager launches non-interactively (for example `codex exec` or
 `claude -p`), or an explicit manual handoff; none is mandatory. Startup ships a
-reference Codex launcher in `startup/scripts/` that a project copies into its
-`.agents/bin/`. A model in a chat-only host cannot initialize an
+reference launcher (`startup/scripts/agent-worker.sh`, Codex and Claude Code
+clients) that a project copies into its `.agents/bin/`. A model in a chat-only host cannot initialize an
 inaccessible filesystem. Format portability is not a guarantee for every model or
 client.
 
