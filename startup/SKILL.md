@@ -269,6 +269,17 @@ tasks are out of its scope.
   `Checkpoint`/`Handoff` or `Review`; the manager relay above is only for runs
   that truly cannot write.
 
+A reference launcher for Codex ships with this skill as
+`scripts/codex-worker.sh`. When a project selects this transport, copy it to
+`<root>/.agents/bin/codex-worker.sh` unchanged: it derives the root from its
+own location, takes task ID, round, role, sandbox and dispatch token, refuses a
+role whose file carries the line `Dispatch: claude-only` or `Dispatch: manual`,
+writes prompt/events/final message/stderr under `target/agents/runs/`, and
+prints only the run directory, thread id, exit code and usage. Record the copy
+in `RULES.md` as the launch command. Adapt it only for a different client or
+output subtree, and say so in the project rules; it is a helper, not a
+dependency of the method.
+
 Delegate implementation and routine review to workers. Keep mandatory
 independent gates on a fresh context and record whether that independence is a
 different model family or only a separate context. Reserve the manager for
