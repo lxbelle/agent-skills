@@ -5,7 +5,7 @@ no mandatory framework, plugin, model provider or installed package set.
 
 | Skill | Purpose | Version |
 | --- | --- | --- |
-| [startup](startup/SKILL.md) | Initialize or reconcile resumable project coordination and role-local implementation, TDD, debugging and review methods | 1.4.0 |
+| [startup](startup/SKILL.md) | Initialize or reconcile resumable project coordination, delegation transports and role-local implementation, TDD, debugging and review methods | 1.5.0 |
 | [design](design/SKILL.md) | Design, implement, review, or refine platform-appropriate product interfaces | 0.1.0 |
 | [cowork](cowork/SKILL.md) | Run any-size model roster through safe sequential turns, evidence-backed ratings and explicit stops | 0.2.0 |
 
@@ -14,8 +14,9 @@ no mandatory framework, plugin, model provider or installed package set.
 The skills use the common [Agent Skills format](https://agentskills.io/specification).
 The client must read instructions, access the target project with permission and
 persist files. Verification uses available project tools; no runtime packages are
-bundled. Native subagents are optional: unsupported delegation or persistence uses
-an explicit manual handoff. A model in a chat-only host cannot initialize an
+bundled. Delegation uses the host's native subagents, an authorized command-line
+worker that the manager launches non-interactively (for example `codex exec` or
+`claude -p`), or an explicit manual handoff; none is mandatory. A model in a chat-only host cannot initialize an
 inaccessible filesystem. Format portability is not a guarantee for every model or
 client.
 

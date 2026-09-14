@@ -52,7 +52,8 @@ framework prescription or speculative component library. Keep substantial
 conditional guidance in `design/references/` and retain third-party notices.
 
 For Startup, preserve authority, public/private routing, pauses, exact writer and
-launch identity, safe recovery, report transport and acceptance versus integration.
+launch identity, the three delegation transports, manager context economy, safe
+recovery, report transport and acceptance versus integration.
 Keep engineering methods project-local and routed by role. Do not weaken these
 contracts to meet a line/token target. When the contract changes, update both
 version metadata and its generated Built-from marker, then review README claims.

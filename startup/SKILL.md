@@ -3,7 +3,7 @@ name: startup
 description: "Initialize or adapt a project's agent workspace with durable coordination and self-contained, role-specific implementation, testing and review methods. Use when asked to set up or reconcile this working process, not for application startup, deployment, or ordinary implementation tasks."
 license: MIT
 metadata:
-  version: "1.4.0"
+  version: "1.5.0"
 ---
 
 # Startup
@@ -149,6 +149,9 @@ instructions usable independently:
 - Reply in the user's language; preserve project language conventions, defaulting
   new agent files to English. Durable state/evidence timestamps include timezone.
   Reply timestamps are optional preferences; query fresh time when required.
+- Spend expensive context on decisions. A manager reads packets, diffs and
+  observed check outputs, not worker transcripts; a worker reads its role chain,
+  packet and named inputs, not manager state or other tasks.
 
 ### Client entry and worker context
 
@@ -202,9 +205,14 @@ skills or copies forming a second workflow. Existing skills/platform triggers
 remain applicable. Resolve incompatible instructions before changing the affected
 contract; removing or reconfiguring installed skills needs separate authorization.
 
-Use the host's native delegation tools only when available and authorized.
-Otherwise give the user a concise launch prompt; do not simulate a separate
-agent or create a user-visible task without permission. Each dispatch identifies
+Three delegation transports exist: the host's native delegation tools; an
+authorized command-line worker, where the manager launches another agent client
+non-interactively from its own shell (see below); and a manual launch prompt
+given to the user. Use native tools or command-line workers only when available
+and authorized; otherwise give the user a concise launch prompt. Do not simulate
+a separate agent or create a user-visible task without permission. Select the
+transport per role by capability and cost: the manager's own model is not the
+default executor. Record each run's transport in its packet. Each dispatch identifies
 the project/router, execution root, branch/base when applicable, role chain, task ID,
 round and manager-assigned dispatch token, canonical coordination-packet
 location, and input/output delivery method. Preserve existing isolation rules.
@@ -225,6 +233,46 @@ actor edits the packet until the run yields and delivery completes. This is a
 transport exception, not a second content owner or permission to rewrite an
 assignment. If neither direct writes nor an authorized relay is available, stop
 before dispatch and resolve delivery.
+
+### Command-line workers
+
+A command-line worker is one non-interactive invocation of an agent client
+(for example `codex exec`, `claude -p`, `gemini -p`) that the manager launches
+with the execution root, sandbox mode and prompt on the command line. It reads
+the project's own instruction chain from the execution root like any session,
+so the launch prompt must name the role: state that the run is the assigned
+executor or reviewer, not the manager, and give its role chain, task ID, round,
+dispatch token, canonical packet and named inputs. Manager state and other
+tasks are out of its scope.
+
+- One invocation is one turn; the worker cannot receive messages mid-run. Send
+  an amendment or correction after the run yields: resume the same thread or
+  session with a new round and token when the client supports resumption,
+  otherwise launch a new run recorded as a new round. Do not edit the packet
+  while the process is alive.
+- Close standard input or feed it the prompt file explicitly; a client that
+  detects a pipe may wait for input indefinitely. Give the client a sandbox no
+  wider than the role: read-only for reviewers, workspace-write for executors;
+  never a flag that bypasses approvals and sandboxing. The sandbox does not
+  enforce `Writable paths`; the manager verifies them from the diff and file
+  status at acceptance.
+- Route the worker's transcript and event stream to files under the project's
+  authorized build/scratch subtree, never into the manager's context. The
+  manager reads the final message file, the worker's packet sections, the diff
+  and observed check outputs; it opens the transcript only to debug a failed run.
+- Take the run identity from the client's own output (thread, session or run
+  id). Record it with its token in `STATE.md` and stamp it into `Writer run`
+  when the worker cannot read its own identifier. Process exit plus a written
+  final message is authoritative termination evidence; exit without a final
+  message or handoff is a failed run, not a yield, and its checkpoint is kept.
+- A worker with write access to the coordination root writes its own
+  `Checkpoint`/`Handoff` or `Review`; the manager relay above is only for runs
+  that truly cannot write.
+
+Delegate implementation and routine review to workers. Keep mandatory
+independent gates on a fresh context and record whether that independence is a
+different model family or only a separate context. Reserve the manager for
+decomposition, packets, evidence reading, adjudication and verdicts.
 
 Parallel assignments need disjoint writable paths and separate packets; agree
 shared-interface dependencies and owners first. Review starts after writer yield.
@@ -380,8 +428,9 @@ and no delegated writer or pending write/delivery operation still owns its
 paths. Record that evidence and preserve its checkpoint. If liveness is unknown,
 wait or ask; elapsed time, a missing listing or stale timestamps are not proof.
 Never steal a claim on a timeout. While a run holds the packet, send an amendment
-as a message; the writer records it verbatim, attributed and numbered, in its
-own section. Never silently rewrite an active assignment.
+as a message, or deliver it at the next resume of a turn-based command-line
+worker; the writer records it verbatim, attributed and numbered, in its own
+section. Never silently rewrite an active assignment.
 
 Keep handoff and review records identified by round, author/run and artifact
 identity: a commit hash for committed content, or a reproducible base-plus-diff
@@ -435,7 +484,7 @@ checks, remaining work and next action. Save conclusions, not reasoning transcri
 A replacement continues from verified role/packet inputs without reconstructed
 chat or an installed Startup skill.
 
-Record `Built from: startup skill 1.4.0` in project state; keep the revision in
+Record `Built from: startup skill 1.5.0` in project state; keep the revision in
 this file current when its contract changes. Updating the installed skill does
 not update existing projects. Reconcile a project only when asked, preserving
 its decisions and live work. Do not link its working rules to this source file.
@@ -462,7 +511,8 @@ Before declaring setup ready, establish that:
   discoverable before it starts, its token maps to its native identity when
   known, and uncertain liveness cannot authorize a competing writer.
 - Isolated runs have explicit execution/base and coordination locations plus
-  authorized input and report transport. Replicas cannot become competing
+  authorized input and report transport, including the selected delegation
+  transport and where worker output lands. Replicas cannot become competing
   writable packets. Evidence identifies its round and artifact; acceptance is
   distinguishable from pending integration or commit.
 - Existing decisions, tasks and user edits were preserved; changes remain in
@@ -487,6 +537,7 @@ per-task gate; reuse unaffected evidence and skip suites for cosmetic edits.
 | Packet/checkpoint/transport changes or new delivery path | After safe release, a replacement resumes from role/packet/inputs, preserving progress and evidence |
 | Setup/reconciliation changes or authorized migration | Reapplication preserves user edits, decisions and progress without duplicate routes or rewritten archives |
 | Authority/ownership/recovery changes | Separate negatives: no product dispatch during pause; no competing writer/redispatch with unknown exact-run liveness or launch outcome |
+| Delegation transport changes or a new worker client | A launched worker claims only its packet, writes its own sections or is relayed as declared, its run identity is recorded against its token, its transcript stays out of the manager's context, and a run that exits without a handoff is recorded as failed, not yielded |
 | Public/private route or public-check changes | Public paths resolve without private files/Startup; execute commands only when authorized |
 | Engineering-method changes | Select affected cases: local-method fail/pass regression and evidence-led correction; docs/scaffold scope stays bounded; unowned doc updates reported pending; reviewer separates defects/advice and missing evidence from a pass |
 
