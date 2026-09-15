@@ -9,8 +9,10 @@ because a skill is present.
 - [README.md](README.md): purpose, installation, lifecycle and release boundaries.
 - [cowork/SKILL.md](cowork/SKILL.md): durable sequential model turns, roster launch,
   shared handoffs and owner/final stop conditions.
-- [design/SKILL.md](design/SKILL.md): the portable product-interface design,
+- [simple-design/SKILL.md](simple-design/SKILL.md): the portable product-interface design,
   implementation and review workflow, with conditional references.
+- [mac-control/SKILL.md](mac-control/SKILL.md): background macOS GUI driving
+  through cua-driver for Claude Code and Codex, with its shell helpers.
 - [startup/SKILL.md](startup/SKILL.md): the authoritative Startup runtime contract.
   Read it completely when editing or applying Startup, not for unrelated work.
 - [CLAUDE.md](CLAUDE.md): a thin import of this file, not a second instruction set.
@@ -49,7 +51,7 @@ For Design, preserve brief-specific art direction, genuinely divergent concepts,
 desktop/web/iOS/Android platform routing, accessibility, adaptive behavior and
 rendered review. Do not turn it into a marketing-page generator, fixed aesthetic,
 framework prescription or speculative component library. Keep substantial
-conditional guidance in `design/references/` and retain third-party notices.
+conditional guidance in `simple-design/references/` and retain third-party notices.
 
 For Startup, preserve authority, public/private routing, pauses, exact writer and
 launch identity, the three delegation transports, manager context economy, safe
@@ -66,7 +68,7 @@ bounded scope and disposable workspaces. Format/discovery/behavior are different
 claims; do not infer universal model support from valid Markdown.
 
 Release files: `.gitignore`, `README.md`, `AGENTS.md`, `CLAUDE.md`,
-`LICENSE`, and the complete `startup/`, `design/`, and `cowork/` directories. The
+`LICENSE`, and the complete `startup/`, `simple-design/`, `mac-control/`, and `cowork/` directories. The
 owner authorized the permissive MIT license. Keep each bundled skill `LICENSE`
 identical to the root license so standalone distribution retains its notice; keep
 Design's applicable third-party notices and license copies with it. Review the

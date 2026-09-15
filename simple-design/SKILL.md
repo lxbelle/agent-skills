@@ -1,5 +1,5 @@
 ---
-name: design
+name: simple-design
 description: Design, implement, review, or refine product interfaces for desktop, web, iOS, and Android. Use for UI/UX direction, accessibility, adaptive layout, interaction, design systems, or platform-native behavior; not standalone graphics.
 license: MIT; see LICENSE and THIRD_PARTY_NOTICES.md
 metadata:

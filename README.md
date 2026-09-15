@@ -7,7 +7,7 @@ no mandatory framework, plugin, model provider or installed package set.
 | --- | --- | --- |
 | [startup](startup/SKILL.md) | Initialize or reconcile resumable project coordination, delegation transports and role-local implementation, TDD, debugging and review methods | 1.5.1 |
 | [mac-control](mac-control/SKILL.md) | Drive macOS apps from Claude Code or Codex through cua-driver without stealing focus: install, permissions, snapshot/act/verify method, web-view text entry, HID fallback | 0.1.0 |
-| [design](design/SKILL.md) | Design, implement, review, or refine platform-appropriate product interfaces | 0.1.0 |
+| [simple-design](simple-design/SKILL.md) | Design, implement, review, or refine platform-appropriate product interfaces (named `simple-design` because Claude Code ships a built-in `design` skill) | 0.1.0 |
 | [cowork](cowork/SKILL.md) | Run any-size model roster through safe sequential turns, evidence-backed ratings and explicit stops | 0.2.0 |
 
 ## Requirements and scope
@@ -39,7 +39,7 @@ configured interface and exact participant allowlist.
 
 ## Install one skill
 
-Review the source first. Copy one selected skill directory—`startup/`, `design/`, or
+Review the source first. Copy one selected skill directory—`startup/`, `simple-design/`, or
 `cowork/`—into **one** selected skill location. Keep its complete contents, including
 licenses, notices, references and scripts. Do not copy the whole repository. Compare
 versions and preserve local changes before overwriting an existing installation.
@@ -58,7 +58,7 @@ Routes follow the official documentation linked below.
 
 Here `~` means your user profile, not a path inside this repository. Confirm the
 actual client's discovery location; older/local Codex setups may expose
-`~/.codex/skills` instead. Replace `<skill-name>` with `startup`, `design`, or
+`~/.codex/skills` instead. Replace `<skill-name>` with `startup`, `simple-design`, or
 `cowork`, reload or restart as the client requires, and verify that the selected
 skill appears before claiming installation succeeded.
 
@@ -84,14 +84,20 @@ participants through an already configured interface. If no mode was specified, 
 asks before launching. Cowork never enables dangerous bypass flags or enlarges any
 participant's authorization.
 
-Design can be selected implicitly for interface work or named directly:
+Simple-design can be selected implicitly for interface work or named directly:
 
-> Use our design skill to design and implement this interface. Preserve the
-> product's existing constraints and make the result native to its target platform.
+> Use the simple-design skill to design and implement this interface. Preserve
+> the product's existing constraints and make the result native to its target platform.
 
-If a host also provides a skill named `design`, verify that it selected this
-package by its source or description; otherwise name the installed package path
-explicitly in the request.
+The package is named `simple-design` because Claude Code ships its own built-in
+`design` skill (a visual canvas); the distinct name avoids that collision, so
+install it under `simple-design` in every host.
+
+Mac-control is for GUI inspection of a running macOS app from the agent
+without stealing the user's focus; it installs and drives `cua-driver` over MCP:
+
+> Use the mac-control skill to inspect the running application window and
+> verify the change in the interface.
 
 When multiple concepts are requested, the skill requires structural variation, not
 one layout recolored several ways. Its supporting references are read only for the
@@ -152,8 +158,8 @@ project rules, state or work. Removing other global skills is a separate decisio
 ## Package and verification
 
 The public package consists of `.gitignore`, `README.md`, `AGENTS.md`, `CLAUDE.md`,
-`LICENSE`, and the complete `startup/`, `design/`, and `cowork/` directories. Each
-bundled MIT license matches the root notice for standalone distribution; `design/`
+`LICENSE`, and the complete `startup/`, `simple-design/`, `mac-control/`, and `cowork/` directories. Each
+bundled MIT license matches the root notice for standalone distribution; `simple-design/`
 also retains its third-party notices and Apache-2.0 license copy. Local chats,
 research, historical specifications, templates, fixtures and caches live under
 ignored `.agents/`.
@@ -173,7 +179,7 @@ modification, redistribution, commercial use and sublicensing are permitted,
 provided the copyright and license notice are retained. The work is provided without
 warranty. Each standalone skill includes the same notice in its `LICENSE` file. The
 design skill also contains
-[third-party notices](design/THIRD_PARTY_NOTICES.md) for adapted MIT and Apache-2.0
+[third-party notices](simple-design/THIRD_PARTY_NOTICES.md) for adapted MIT and Apache-2.0
 material; redistributed copies must retain them and the referenced license text.
 
 Repository destination and visibility remain owner choices. Preparing these files
