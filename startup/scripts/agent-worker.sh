@@ -17,7 +17,7 @@
 # is never launched here. Output lands under target/agents/runs/<TASK-ID>-r<round>/:
 # prompt.md, events.jsonl (raw client output), last.md (final message), stderr.log,
 # thread_id. Only the run directory, run id, exit code and usage are printed; the
-# transcript never reaches the manager's context. Optional env: WORKER_MODEL.
+# transcript never reaches the manager's context. Optional env: WORKER_MODEL, WORKER_EFFORT.
 set -eu
 
 usage() { sed -n '9,10p' "$0" >&2; exit 2; }
@@ -120,6 +120,8 @@ build_command() {
       # passed as the equivalent config override.
       if [ -n "$resume_id" ]; then set -- codex exec resume "$resume_id" -c "sandbox_mode=\"$sandbox\""; else set -- codex exec -C "$root" -s "$sandbox"; fi
       [ -z "${WORKER_MODEL:-}" ] || set -- "$@" -m "$WORKER_MODEL"
+      # Optional reasoning effort override (low|medium|high|xhigh|max), e.g. WORKER_EFFORT=xhigh.
+      [ -z "${WORKER_EFFORT:-}" ] || set -- "$@" -c "model_reasoning_effort=\"$WORKER_EFFORT\""
       set -- "$@" --json -o "$last" -
       printf '%s\n' "$@"
       ;;
