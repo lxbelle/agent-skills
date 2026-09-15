@@ -6,6 +6,7 @@ no mandatory framework, plugin, model provider or installed package set.
 | Skill | Purpose | Version |
 | --- | --- | --- |
 | [startup](startup/SKILL.md) | Initialize or reconcile resumable project coordination, delegation transports and role-local implementation, TDD, debugging and review methods | 1.5.1 |
+| [show-limits](show-limits/SKILL.md) | Read and report Claude Code (5h/7d) and Codex (weekly, reset credits) usage limits from any agent role, with the owner's reporting and stop discipline | 0.1.0 |
 | [mac-control](mac-control/SKILL.md) | Drive macOS apps from Claude Code or Codex through cua-driver without stealing focus: install, permissions, snapshot/act/verify method, web-view text entry, HID fallback | 0.1.0 |
 | [simple-design](simple-design/SKILL.md) | Design, implement, review, or refine platform-appropriate product interfaces (named `simple-design` because Claude Code ships a built-in `design` skill) | 0.1.0 |
 | [cowork](cowork/SKILL.md) | Run any-size model roster through safe sequential turns, evidence-backed ratings and explicit stops | 0.2.0 |
@@ -99,6 +100,12 @@ without stealing the user's focus; it installs and drives `cua-driver` over MCP:
 > Use the mac-control skill to inspect the running application window and
 > verify the change in the interface.
 
+Show-limits reads both hosts' subscription limits (Claude Code 5-hour/7-day,
+Codex weekly) from any role and sets the reporting cadence:
+
+> Use the show-limits skill: report the remaining limits before and after each
+> worker round and stop before they run out.
+
 When multiple concepts are requested, the skill requires structural variation, not
 one layout recolored several ways. Its supporting references are read only for the
 visual, accessibility, adaptive-platform or interaction concerns in the task.
@@ -158,7 +165,7 @@ project rules, state or work. Removing other global skills is a separate decisio
 ## Package and verification
 
 The public package consists of `.gitignore`, `README.md`, `AGENTS.md`, `CLAUDE.md`,
-`LICENSE`, and the complete `startup/`, `simple-design/`, `mac-control/`, and `cowork/` directories. Each
+`LICENSE`, and the complete `startup/`, `simple-design/`, `mac-control/`, `show-limits/`, and `cowork/` directories. Each
 bundled MIT license matches the root notice for standalone distribution; `simple-design/`
 also retains its third-party notices and Apache-2.0 license copy. Local chats,
 research, historical specifications, templates, fixtures and caches live under

@@ -13,6 +13,8 @@ because a skill is present.
   implementation and review workflow, with conditional references.
 - [mac-control/SKILL.md](mac-control/SKILL.md): background macOS GUI driving
   through cua-driver for Claude Code and Codex, with its shell helpers.
+- [show-limits/SKILL.md](show-limits/SKILL.md): reading and reporting Claude
+  Code and Codex usage limits from any role, with helper scripts.
 - [startup/SKILL.md](startup/SKILL.md): the authoritative Startup runtime contract.
   Read it completely when editing or applying Startup, not for unrelated work.
 - [CLAUDE.md](CLAUDE.md): a thin import of this file, not a second instruction set.
@@ -68,7 +70,7 @@ bounded scope and disposable workspaces. Format/discovery/behavior are different
 claims; do not infer universal model support from valid Markdown.
 
 Release files: `.gitignore`, `README.md`, `AGENTS.md`, `CLAUDE.md`,
-`LICENSE`, and the complete `startup/`, `simple-design/`, `mac-control/`, and `cowork/` directories. The
+`LICENSE`, and the complete `startup/`, `simple-design/`, `mac-control/`, `show-limits/`, and `cowork/` directories. The
 owner authorized the permissive MIT license. Keep each bundled skill `LICENSE`
 identical to the root license so standalone distribution retains its notice; keep
 Design's applicable third-party notices and license copies with it. Review the
