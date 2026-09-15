@@ -5,7 +5,8 @@ no mandatory framework, plugin, model provider or installed package set.
 
 | Skill | Purpose | Version |
 | --- | --- | --- |
-| [startup](startup/SKILL.md) | Initialize or reconcile resumable project coordination, delegation transports and role-local implementation, TDD, debugging and review methods | 1.5.0 |
+| [startup](startup/SKILL.md) | Initialize or reconcile resumable project coordination, delegation transports and role-local implementation, TDD, debugging and review methods | 1.5.1 |
+| [mac-control](mac-control/SKILL.md) | Drive macOS apps from Claude Code or Codex through cua-driver without stealing focus: install, permissions, snapshot/act/verify method, web-view text entry, HID fallback | 0.1.0 |
 | [design](design/SKILL.md) | Design, implement, review, or refine platform-appropriate product interfaces | 0.1.0 |
 | [cowork](cowork/SKILL.md) | Run any-size model roster through safe sequential turns, evidence-backed ratings and explicit stops | 0.2.0 |
 

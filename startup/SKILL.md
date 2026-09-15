@@ -3,7 +3,7 @@ name: startup
 description: "Initialize or adapt a project's agent workspace with durable coordination and self-contained, role-specific implementation, testing and review methods. Use when asked to set up or reconcile this working process, not for application startup, deployment, or ordinary implementation tasks."
 license: MIT
 metadata:
-  version: "1.5.0"
+  version: "1.5.1"
 ---
 
 # Startup

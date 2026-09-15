@@ -115,9 +115,12 @@ build_command() {
   case "$client" in
     codex)
       # Sandbox is OS-enforced. --json streams events; -o writes the final message.
-      if [ -n "$resume_id" ]; then set -- codex exec resume "$resume_id"; else set -- codex exec; fi
+      # `codex exec resume` accepts neither -C nor -s (codex-cli 0.153): the
+      # working directory is this launcher's cd into $root and the sandbox is
+      # passed as the equivalent config override.
+      if [ -n "$resume_id" ]; then set -- codex exec resume "$resume_id" -c "sandbox_mode=\"$sandbox\""; else set -- codex exec -C "$root" -s "$sandbox"; fi
       [ -z "${WORKER_MODEL:-}" ] || set -- "$@" -m "$WORKER_MODEL"
-      set -- "$@" -C "$root" -s "$sandbox" --json -o "$last" -
+      set -- "$@" --json -o "$last" -
       printf '%s\n' "$@"
       ;;
     claude)
