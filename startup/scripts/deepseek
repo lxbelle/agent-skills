@@ -12,8 +12,10 @@
 # directory. The first run creates ~/.deepseek/config.toml and copies the model
 # catalog (models.json) out of DeepSeek's official Codex setup script.
 #
-# Usage: deepseek [codex arguments], e.g. `deepseek` or `deepseek exec "task"`;
-# `-m deepseek-flash` or `-c model_reasoning_effort="max"` override the defaults.
+# Usage: deepseek [codex arguments], e.g. `deepseek` or `deepseek exec "task"`.
+# The model, provider and effort are pinned so that project configs cannot
+# change them; override them after the subcommand, e.g.
+# `deepseek exec -m deepseek-flash -c model_reasoning_effort="max" "task"`.
 DEEPSEEK_API_KEY=''
 
 set -eu
@@ -53,6 +55,36 @@ EOF
   echo "deepseek: created $home (config.toml, models.json)" >&2
 fi
 
+# DeepSeek's catalog introduces the model as "Codex, an agent based on GPT-5";
+# rename it so the model calls itself DeepSeek (also fixes older catalogs).
+if grep -q 'You are Codex, an agent based on GPT-5' "$home/models.json"; then
+  sed -e 's/You are Codex, an agent based on GPT-5\./You are DeepSeek, a coding agent built on a DeepSeek model and running in the Codex CLI./g' \
+    -e 's/As Codex, you are/As DeepSeek, you are/g' "$home/models.json" > "$home/models.json.tmp.$$"
+  chmod 600 "$home/models.json.tmp.$$"
+  mv "$home/models.json.tmp.$$" "$home/models.json"
+fi
+
 export DEEPSEEK_API_KEY
 export CODEX_HOME="$home"
+
+# Pin the DeepSeek settings as -c overrides. A trusted project's
+# .codex/config.toml outranks $CODEX_HOME/config.toml (launched from $HOME,
+# that is ~/.codex, the regular Codex config), and a subcommand's own -c list
+# replaces the top-level one, so the pins go right after the subcommand
+# (exec, exec resume|fork|review, review, resume, fork). Flags the caller gives
+# after them, such as -m or -c model_reasoning_effort=..., still win.
+case "${1:-}" in
+  exec|e) case "${2:-}" in resume|fork|review) at=2 ;; *) at=1 ;; esac ;;
+  review|resume|fork) at=1 ;;
+  *) at=0 ;;
+esac
+pins='set -- "$@" -c "model_provider=\"deepseek\"" -c "model=\"deepseek-v4-pro\"" -c "model_reasoning_effort=\"high\"" -c "model_catalog_json=\"$home/models.json\""'
+i=0
+for arg do
+  shift
+  [ "$i" -ne "$at" ] || eval "$pins"
+  set -- "$@" "$arg"
+  i=$((i + 1))
+done
+[ "$i" -gt "$at" ] || eval "$pins"
 exec codex "$@"

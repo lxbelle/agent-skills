@@ -3,7 +3,7 @@ name: startup
 description: "Initialize or adapt a project's agent workspace with durable coordination and self-contained, role-specific implementation, testing and review methods. Use when asked to set up or reconcile this working process, not for application startup, deployment, or ordinary implementation tasks."
 license: MIT
 metadata:
-  version: "1.6.0"
+  version: "1.6.1"
 ---
 
 # Startup
@@ -287,7 +287,10 @@ of the method.
 DeepSeek is an optional client and requires the Codex CLI (`codex`) in `PATH`.
 The skill ships `scripts/deepseek`, a wrapper that runs `codex` with
 `CODEX_HOME=~/.deepseek` on `deepseek-v4-pro` with reasoning effort `high` and
-creates that directory (config and DeepSeek's model catalog) on first run. If
+creates that directory (config and DeepSeek's model catalog) on first run. It
+pins these settings as command-line overrides, because a trusted project's
+`.codex/config.toml` (from `$HOME`, the regular `~/.codex`) outranks
+`$CODEX_HOME/config.toml`; options passed after the subcommand still win. If
 the user wants DeepSeek, the user copies the script to a directory on `PATH` as
 `deepseek` (for example `~/.local/bin/deepseek`, mode 700) or asks the agent to
 install it there. The script ships with an empty key: the user must add their
@@ -511,7 +514,7 @@ checks, remaining work and next action. Save conclusions, not reasoning transcri
 A replacement continues from verified role/packet inputs without reconstructed
 chat or an installed Startup skill.
 
-Record `Built from: startup skill 1.6.0` in project state; keep the revision in
+Record `Built from: startup skill 1.6.1` in project state; keep the revision in
 this file current when its contract changes. Updating the installed skill does
 not update existing projects. Reconcile a project only when asked, preserving
 its decisions and live work. Do not link its working rules to this source file.

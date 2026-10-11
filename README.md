@@ -5,7 +5,7 @@ no mandatory framework, plugin, model provider or installed package set.
 
 | Skill | Purpose | Version |
 | --- | --- | --- |
-| [startup](startup/SKILL.md) | Initialize or reconcile resumable project coordination, delegation transports and role-local implementation, TDD, debugging and review methods | 1.6.0 |
+| [startup](startup/SKILL.md) | Initialize or reconcile resumable project coordination, delegation transports and role-local implementation, TDD, debugging and review methods | 1.6.1 |
 | [show-limits](show-limits/SKILL.md) | Read and report Claude Code (5h/7d) and Codex (weekly, reset credits) usage limits from any agent role, with the owner's reporting and stop discipline | 0.1.0 |
 | [mac-control](mac-control/SKILL.md) | Drive macOS apps from Claude Code or Codex through cua-driver without stealing focus: install, permissions, snapshot/act/verify method, web-view text entry, HID fallback | 0.1.0 |
 | [simple-design](simple-design/SKILL.md) | Design, implement, review, or refine platform-appropriate product interfaces (named `simple-design` because Claude Code ships a built-in `design` skill) | 0.1.0 |
