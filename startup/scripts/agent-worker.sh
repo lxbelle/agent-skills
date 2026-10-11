@@ -9,8 +9,10 @@
 #   agent-worker.sh <client> <TASK-ID> <round> <role> <read-only|workspace-write> <dispatch-token>
 #                   [--resume <run-id> <amendment-file>] [--print]
 #
-# Clients: codex (codex exec), claude (claude -p). Add another client by adding one
-# case to build_command() and one to extract_identity(); do not change the prompt.
+# Clients: codex (codex exec), claude (claude -p), deepseek (codex exec through the
+# `deepseek` wrapper, scripts/deepseek: Codex CLI on DeepSeek). Add another client
+# by adding one case to build_command() and one to extract_identity(); do not
+# change the prompt.
 # Roles: `reviewer` writes Review; any other role writes Checkpoint/Handoff and
 # chains .agents/roles/developer.md first unless it is `developer`. A role file
 # carrying `Dispatch: <client>-only` runs only on that client; `Dispatch: manual`
@@ -32,7 +34,7 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-case "$client" in codex|claude) ;; *) echo "Client '$client' is not configured in this launcher (codex, claude). Add it to build_command/extract_identity." >&2; exit 2 ;; esac
+case "$client" in codex|claude|deepseek) ;; *) echo "Client '$client' is not configured in this launcher (codex, claude, deepseek). Add it to build_command/extract_identity." >&2; exit 2 ;; esac
 command -v "$client" >/dev/null 2>&1 || { echo "Client binary '$client' not found in PATH" >&2; exit 2; }
 
 script_dir="$(cd "$(dirname "$0")" && pwd -P)"
@@ -113,14 +115,17 @@ fi
 # refuse approval/sandbox bypass flags.
 build_command() {
   case "$client" in
-    codex)
+    codex|deepseek)
       # Sandbox is OS-enforced. --json streams events; -o writes the final message.
       # `codex exec resume` accepts neither -C nor -s (codex-cli 0.153): the
       # working directory is this launcher's cd into $root and the sandbox is
-      # passed as the equivalent config override.
-      if [ -n "$resume_id" ]; then set -- codex exec resume "$resume_id" -c "sandbox_mode=\"$sandbox\""; else set -- codex exec -C "$root" -s "$sandbox"; fi
+      # passed as the equivalent config override. `deepseek` takes the same
+      # arguments (it execs codex with CODEX_HOME=~/.deepseek, model
+      # deepseek-v4-pro or WORKER_MODEL=deepseek-flash).
+      if [ -n "$resume_id" ]; then set -- "$client" exec resume "$resume_id" -c "sandbox_mode=\"$sandbox\""; else set -- "$client" exec -C "$root" -s "$sandbox"; fi
       [ -z "${WORKER_MODEL:-}" ] || set -- "$@" -m "$WORKER_MODEL"
-      # Optional reasoning effort override (low|medium|high|xhigh|max), e.g. WORKER_EFFORT=xhigh.
+      # Optional reasoning effort override, e.g. WORKER_EFFORT=xhigh: Codex
+      # low|medium|high|xhigh|max, DeepSeek low|high|max (default high).
       [ -z "${WORKER_EFFORT:-}" ] || set -- "$@" -c "model_reasoning_effort=\"$WORKER_EFFORT\""
       set -- "$@" --json -o "$last" -
       printf '%s\n' "$@"
@@ -146,7 +151,7 @@ build_command() {
 # Per-client identity/usage/final-message extraction from $events.
 extract_identity() {
   case "$client" in
-    codex)
+    codex|deepseek)
       thread="$(grep -m1 -o '"thread_id":"[^"]*"' "$events" 2>/dev/null | cut -d'"' -f4 || true)"
       usage_line="$(grep -o '"usage":{[^}]*}' "$events" 2>/dev/null | tail -1 || true)"
       ;;

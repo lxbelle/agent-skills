@@ -5,7 +5,7 @@ no mandatory framework, plugin, model provider or installed package set.
 
 | Skill | Purpose | Version |
 | --- | --- | --- |
-| [startup](startup/SKILL.md) | Initialize or reconcile resumable project coordination, delegation transports and role-local implementation, TDD, debugging and review methods | 1.5.1 |
+| [startup](startup/SKILL.md) | Initialize or reconcile resumable project coordination, delegation transports and role-local implementation, TDD, debugging and review methods | 1.6.0 |
 | [show-limits](show-limits/SKILL.md) | Read and report Claude Code (5h/7d) and Codex (weekly, reset credits) usage limits from any agent role, with the owner's reporting and stop discipline | 0.1.0 |
 | [mac-control](mac-control/SKILL.md) | Drive macOS apps from Claude Code or Codex through cua-driver without stealing focus: install, permissions, snapshot/act/verify method, web-view text entry, HID fallback | 0.1.0 |
 | [simple-design](simple-design/SKILL.md) | Design, implement, review, or refine platform-appropriate product interfaces (named `simple-design` because Claude Code ships a built-in `design` skill) | 0.1.0 |
@@ -19,8 +19,11 @@ persist files. Verification uses available project tools; no runtime packages ar
 bundled. Delegation uses the host's native subagents, an authorized command-line
 worker that the manager launches non-interactively (for example `codex exec` or
 `claude -p`), or an explicit manual handoff; none is mandatory. Startup ships a
-reference launcher (`startup/scripts/agent-worker.sh`, Codex and Claude Code
-clients) that a project copies into its `.agents/bin/`. A model in a chat-only host cannot initialize an
+reference launcher (`startup/scripts/agent-worker.sh`, Codex, Claude Code and
+DeepSeek clients) that a project copies into its `.agents/bin/`. DeepSeek is
+optional and requires the Codex CLI: copy `startup/scripts/deepseek` to a
+directory on `PATH` as `deepseek` (or ask the agent to install it there) and add
+your DeepSeek API key to it. A model in a chat-only host cannot initialize an
 inaccessible filesystem. Format portability is not a guarantee for every model or
 client.
 

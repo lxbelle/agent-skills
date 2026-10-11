@@ -3,7 +3,7 @@ name: startup
 description: "Initialize or adapt a project's agent workspace with durable coordination and self-contained, role-specific implementation, testing and review methods. Use when asked to set up or reconcile this working process, not for application startup, deployment, or ordinary implementation tasks."
 license: MIT
 metadata:
-  version: "1.5.1"
+  version: "1.6.0"
 ---
 
 # Startup
@@ -272,7 +272,8 @@ tasks are out of its scope.
 A reference launcher ships with this skill as `scripts/agent-worker.sh`. When
 a project selects this transport, copy it unchanged to
 `<root>/.agents/bin/agent-worker.sh`. It takes the client (`codex` via
-`codex exec`, `claude` via `claude -p`; another client is one added case),
+`codex exec`, `claude` via `claude -p`, `deepseek` via `codex exec` on
+DeepSeek; another client is one added case),
 task ID, round, role, access level and dispatch token; derives the root from
 its own location; refuses a role whose file carries `Dispatch: manual` or a
 `Dispatch: <other-client>-only` line; feeds the prompt on stdin; writes
@@ -282,6 +283,18 @@ to each client's own boundary (Codex sandbox; Claude permission mode `plan`
 for both levels, with editing tools removed for read-only), never to a bypass flag. Record
 the copy in `RULES.md` as the launch command; it is a helper, not a dependency
 of the method.
+
+DeepSeek is an optional client and requires the Codex CLI (`codex`) in `PATH`.
+The skill ships `scripts/deepseek`, a wrapper that runs `codex` with
+`CODEX_HOME=~/.deepseek` on `deepseek-v4-pro` with reasoning effort `high` and
+creates that directory (config and DeepSeek's model catalog) on first run. If
+the user wants DeepSeek, the user copies the script to a directory on `PATH` as
+`deepseek` (for example `~/.local/bin/deepseek`, mode 700) or asks the agent to
+install it there. The script ships with an empty key: the user must add their
+DeepSeek API key to `DEEPSEEK_API_KEY` in that copy before the first run.
+Agents never write the key, never copy it into project or coordination files,
+and never commit a copy that holds it. For DeepSeek, `WORKER_EFFORT` accepts
+`low`, `high` or `max`.
 
 Delegate implementation and routine review to workers. Keep mandatory
 independent gates on a fresh context and record whether that independence is a
@@ -498,7 +511,7 @@ checks, remaining work and next action. Save conclusions, not reasoning transcri
 A replacement continues from verified role/packet inputs without reconstructed
 chat or an installed Startup skill.
 
-Record `Built from: startup skill 1.5.0` in project state; keep the revision in
+Record `Built from: startup skill 1.6.0` in project state; keep the revision in
 this file current when its contract changes. Updating the installed skill does
 not update existing projects. Reconcile a project only when asked, preserving
 its decisions and live work. Do not link its working rules to this source file.

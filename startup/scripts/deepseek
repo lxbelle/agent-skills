@@ -1,0 +1,58 @@
+#!/bin/sh
+# DeepSeek through the Codex CLI (optional client of the Startup reference
+# launcher, "Command-line workers"). Runs `codex` with CODEX_HOME=~/.deepseek on
+# deepseek-v4-pro with reasoning effort high.
+#
+# Requires the Codex CLI (`codex`) in PATH. Install: copy this file to a directory
+# on PATH as `deepseek` (for example ~/.local/bin/deepseek), chmod 700, and paste
+# your DeepSeek API key into DEEPSEEK_API_KEY below. Never commit or share a copy
+# that holds the key.
+#
+# Config, sessions and logs live in ~/.deepseek; the agent works in the current
+# directory. The first run creates ~/.deepseek/config.toml and copies the model
+# catalog (models.json) out of DeepSeek's official Codex setup script.
+#
+# Usage: deepseek [codex arguments], e.g. `deepseek` or `deepseek exec "task"`;
+# `-m deepseek-flash` or `-c model_reasoning_effort="max"` override the defaults.
+DEEPSEEK_API_KEY=''
+
+set -eu
+home="$HOME/.deepseek"
+setup_url="https://cdn.deepseek.com/api-docs/codex-deepseek-setup-en.sh"
+
+[ -n "$DEEPSEEK_API_KEY" ] || { echo "deepseek: paste your DeepSeek API key into DEEPSEEK_API_KEY in $0" >&2; exit 2; }
+command -v codex >/dev/null 2>&1 || { echo "deepseek: requires the Codex CLI (codex) in PATH" >&2; exit 127; }
+
+if [ ! -f "$home/config.toml" ] || [ ! -f "$home/models.json" ]; then
+  mkdir -p "$home"
+  chmod 700 "$home"
+  if [ ! -f "$home/models.json" ]; then
+    tmp="$home/models.json.tmp.$$"
+    curl -fsSL "$setup_url" | sed -n "/<<'CODEX_MODELS_JSON'\$/,/^CODEX_MODELS_JSON\$/p" | sed '1d;$d' > "$tmp"
+    grep -q '"deepseek-v4-pro"' "$tmp" || { rm -f "$tmp"; echo "deepseek: no model catalog found in $setup_url" >&2; exit 1; }
+    mv "$tmp" "$home/models.json"
+  fi
+  [ -f "$home/config.toml" ] || cat > "$home/config.toml" <<EOF
+# Codex CLI on DeepSeek, written by the \`deepseek\` script. Values follow
+# DeepSeek's Codex setup script 1.4.0; the key comes from DEEPSEEK_API_KEY.
+model = "deepseek-v4-pro"
+model_provider = "deepseek"
+model_reasoning_effort = "high"
+model_catalog_json = "$home/models.json"
+forced_login_method = "api"
+web_search = "disabled"
+show_raw_agent_reasoning = true
+
+[model_providers.deepseek]
+name = "deepseek"
+base_url = "https://api.deepseek.com/"
+wire_api = "responses"
+env_key = "DEEPSEEK_API_KEY"
+EOF
+  chmod 600 "$home/config.toml" "$home/models.json"
+  echo "deepseek: created $home (config.toml, models.json)" >&2
+fi
+
+export DEEPSEEK_API_KEY
+export CODEX_HOME="$home"
+exec codex "$@"
